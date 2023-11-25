@@ -16,8 +16,22 @@ fn main() {
             d_s = !d_s;
 
             if !d_s {
-                fs::write("/sys/class/leds/input7::capslock/brightness", b"0").unwrap();
-                Keyboard::CapsLock.click();
+                match fs::read_dir("/sys/class/leds") {
+                    Ok(leds) => {
+                        println!("Disabling capslock");
+
+                        leds
+                            .filter_map(|d| d.ok())
+                            .map(|d| d.file_name().to_string_lossy().to_string())
+                            .filter(|n| n.contains("capslock"))
+                            .for_each(|led| fs::write(format!("/sys/class/leds/{}/brightness", led), b"0").unwrap());
+
+                        Keyboard::CapsLock.click();
+                    }
+                    Err(err) => {
+                        eprintln!("Something went wrong when querying leds: {:?}", err);
+                    }
+                }
             }
         }
 
