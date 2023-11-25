@@ -1,0 +1,15 @@
+[Unit]
+Description=This fixed the annoying capslock problem
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/capsfixer
+WorkingDirectory=/home/
+Restart=always
+RestartSec=5
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=%n
